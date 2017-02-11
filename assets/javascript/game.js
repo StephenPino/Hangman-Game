@@ -9,6 +9,7 @@ var attempts = [];
 var displayString = [];
 var correctAttempts = [];
 var accumulator = 0
+var losses = 0
 
 
 // Chooses a random word from "words" array
@@ -74,11 +75,15 @@ window.onload = function() {
 	document.onkeyup = function(event) {
 
 		if(lives <= 0) {
+			
+			
 			playAgain = confirm("You Lose! Play Again?");
 			if (playAgain !== true) {
 				return false;
 			}
 			else{
+			losses++
+			document.getElementById("losses-div").innerHTML = losses
 			reset();
 			word = chooseWord();
 			blanksFromAnswer(word);
@@ -119,27 +124,38 @@ window.onload = function() {
 
 			}
 
-			// If the chosen letter is in the active word
-			else {
-				// Pushes the user guess into the correctAttempts array
-				correctAttempts.push(userGuess);
-				accumulator++
-				for (var j = 0; j < correctAttempts.length; j++){
-					for( var i = 0; i < word.length; i++) {
-						if(word.charAt(i) === correctAttempts[j]) {
-							displayString += (word.charAt(i));
-						}
-						else{
-							displayString += "_";
-						}
-				
-					}
-				document.getElementById("current-word-div").innerHTML = displayString;	
-				}
-			}
+			   // If the chosen letter is in the active word
+    else {
+      // Pushes the user guess into the correctAttempts array
+      correctAttempts.push(userGuess);
+      accumulator++
+      var test = displayString
+      for( var i = 0; i < word.length; i++) {
+        if((word.charAt(i) === userGuess) && (accumulator <= 1)) {
+          displayString += (userGuess);
+          document.getElementById("current-word-div").innerHTML = displayString;
+        }
+        else if((word.charAt(i) !== userGuess) && (accumulator <= 1)){
+          displayString += "_";
+          document.getElementById("current-word-div").innerHTML = displayString;
+        }
+        else if((word.charAt(i) === userGuess) && (accumulator > 1)) {
+          test = displayString.replace(displayString.charAt(i), word.charAt(i));
+          	document.getElementById("current-word-div").innerHTML = test; 
+
+
+        }
+        else{
+          test = displayString.replace(displayString.charAt(i), "_");
+          document.getElementById("current-word-div").innerHTML = test; 
+        }
+        
+      }
+    }
 		
-		}
+		
 	} //document.onkeyup
 
 
 } //window.onload
+}
