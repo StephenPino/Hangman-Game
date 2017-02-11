@@ -6,7 +6,10 @@ var words = [
 	"spurs"
 ];
 var attempts = [];
-var lettersArray = [];
+var displayString = [];
+var correctAttempts = [];
+var accumulator = 0
+
 
 // Chooses a random word from "words" array
 function chooseWord () {
@@ -16,13 +19,14 @@ function chooseWord () {
 
 }
 
+
 // Sets "_" for each character in word given
 function blanksFromAnswer ( answerWord ) {
     
     var result = ""; // This is the variable we want to use
     
     for(var i = 0; i < answerWord.length; i++ ) {
-    	result += "_ ";
+    	result += "_";
     }
 
     document.getElementById("current-word-div").innerHTML = result;
@@ -31,32 +35,24 @@ function blanksFromAnswer ( answerWord ) {
     return result;
 }
 
-// Replaces nth letter with c character value for a given originalString and returns it as newString variable
-function alterAt ( n, c, originalString ) {
+// resets game
+function reset() {
+	lives = 12;
+	wins = 0
+	attempts = [];
+	displayString = [];
+	correctAttempts = [];
+	accumulator = 0;
+	document.getElementById("letters-guessed-div").innerHTML = ""
 
-   var stringToReturn = "";
 
-   for( var i = 0; i < originalString.length; i++ ) {
-   	
-
-    	if( i !== n ){
-			stringToReturn += originalString.charAt(i);
-
-		} 
- 	
- 		else {
- 			stringToReturn +=c;
-
- 		}
-   }
-   return stringToReturn;
-   
-
+	return;
 }
+ 
 // Upon window load...
 window.onload = function() {
 
-		el = document.getElementById("lives-remaining-div");
+		var el = document.getElementById("lives-remaining-div");
 		el.innerHTML = lives;
 
 
@@ -64,49 +60,86 @@ window.onload = function() {
 	var word = chooseWord();
 
 	// Run the blanksFromAnswer function and pass through the variable word
-	blanksFromAnswer(word);
+	blanksFromAnswer(word)
+
+		if(lives <= 0) {
+			alert("You Lose!");
+			reset();
+
+		}
+
+		else{	
 
 	// When the user presses a key it will run the following function...
 	document.onkeyup = function(event) {
 
-		// Stores the users guess as a variable
-		var userGuess = event.key;
-
-		// If the current guess is already in the attempts array, stop the function
-		if(attempts.includes(userGuess)) {
-			alert("This letter has already been guessed, try another!");
-
-			return false;
-		}
-
-		// Pushes the guessed letter to the guessed letter array
-		attempts.push(userGuess);
-
-		// Checks to see if userGuess is in the active word
-		var checkLetter = word.indexOf(userGuess);
-
-		// If the chosen letter is not in the active word...
-		if(checkLetter < 0) {
-
-			// Remove 1 life
-			lives--;
-
-			// Add the letter to the letters-guessed div
-			document.getElementById("letters-guessed-div").innerHTML += userGuess;
-
-			// Adds remaining lives to UI
-			el = document.getElementById("lives-remaining-div");
-			el.innerHTML = lives;
-
-		}
-
-		// If the chosen letter is in the active word
-		else {
-			var newString = alterAt(word.indexOf(userGuess), userGuess, word;
+		if(lives <= 0) {
+			playAgain = confirm("You Lose! Play Again?");
+			if (playAgain !== true) {
+				return false;
+			}
+			else{
+			reset();
+			word = chooseWord();
+			blanksFromAnswer(word);
+			}
 		}
 
 		
-	}
+
+			// Stores the users guess as a variable
+			var userGuess = event.key;
+
+			// If the current guess is already in the attempts array, stop the function
+			if(attempts.includes(userGuess)) {
+				alert("This letter has already been guessed, try another!");
+
+				return false;
+			}
+
+			// Pushes the guessed letter to the guessed letter array
+			attempts.push(userGuess);
+
+			// Checks to see if userGuess is in the active word
+			var checkLetter = word.indexOf(userGuess);
 
 
-}
+			// If the chosen letter is not in the active word...
+			if(checkLetter < 0) {
+
+				// Remove 1 life
+				lives--;
+
+				// Add the letter to the letters-guessed div
+				document.getElementById("letters-guessed-div").innerHTML += userGuess;
+
+				// Adds remaining lives to UI
+				
+				el.innerHTML = lives;
+
+			}
+
+			// If the chosen letter is in the active word
+			else {
+				// Pushes the user guess into the correctAttempts array
+				correctAttempts.push(userGuess);
+				accumulator++
+				for (var j = 0; j < correctAttempts.length; j++){
+					for( var i = 0; i < word.length; i++) {
+						if(word.charAt(i) === correctAttempts[j]) {
+							displayString += (word.charAt(i));
+						}
+						else{
+							displayString += "_";
+						}
+				
+					}
+				document.getElementById("current-word-div").innerHTML = displayString;	
+				}
+			}
+		
+		}
+	} //document.onkeyup
+
+
+} //window.onload
